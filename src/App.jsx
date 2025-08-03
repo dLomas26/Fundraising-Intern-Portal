@@ -1,31 +1,76 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Leaderboard from './pages/Leaderboard';
 
-// Simple auth check
-const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('intern-token');
-  return token ? <>{children}</> : <Navigate to="/login" replace />;
-};
+const App = () => {
+  const isAuthenticated = () => {
+    return !!localStorage.getItem('intern-token');
+  };
 
-function App() {
+  // Public route wrapper
+  const PublicRoute = ({ children }) => {
+    const location = useLocation();
+    
+    if (isAuthenticated()) {
+      // If logged in and trying to access auth pages, redirect to dashboard
+      return <Navigate to="/dashboard" state={{ from: location }} replace />;
+    }
+    return children;
+  };
+
+  // Protected route wrapper
+  const ProtectedRoute = ({ children }) => {
+    const location = useLocation();
+    
+    if (!isAuthenticated()) {
+      // If not logged in, redirect to login with return location
+      return <Navigate to="/login" state={{ from: location }} replace />;
+    }
+    return children;
+  };
+
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+        {/* Public routes */}
+        <Route path="/login" element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        } />
+        
+        <Route path="/signup" element={
+          <PublicRoute>
+            <Signup />
+          </PublicRoute>
+        } />
+
+        {/* Protected routes */}
+        <Route element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
         </Route>
+
+        {/* Root path redirect */}
+        <Route path="/" element={
+          <Navigate to={isAuthenticated() ? "/dashboard" : "/login"} replace />
+        } />
+
+        {/* Catch-all route */}
+        <Route path="*" element={
+          <Navigate to={isAuthenticated() ? "/dashboard" : "/login"} replace />
+        } />
       </Routes>
     </Router>
   );
-}
+};
 
 export default App;
