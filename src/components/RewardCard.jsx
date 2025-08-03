@@ -34,7 +34,7 @@ const RewardCard = ({ reward, darkMode = false }) => {
           <p className={`text-xs mt-1 ${
             darkMode ? 'text-gray-500' : 'text-gray-500'
           }`}>
-            Required: ${reward.requiredAmount.toeString()}
+            Required: ${reward.requiredAmount.toLocaleString()}
           </p>
         </div>
         {reward.isUnlocked && (
