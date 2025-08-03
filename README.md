@@ -2,7 +2,7 @@
 
 A modern dashboard for fundraising interns with performance tracking, leaderboards, and achievement rewards.
 
-live demo: https://fundraising-intern-portal-chi.vercel.app/login
+live demo: https://fundraising-intern-portal-chi.vercel.app/
 
 ## Features ✨
 
